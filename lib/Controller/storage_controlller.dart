@@ -29,11 +29,13 @@ class StorageController {
     saveData();
   }
   void deleteProduct(Product p){
-    _products.remove(p);
+    int index = _products.indexWhere((element) => element == p);
+    _products.remove(_products[index]);
     saveData();
   }
-  void editProduct(int index, Product p){
-    _products[index] = p;
+  void editProduct(Product old, Product new_p){
+    int index = _products.indexWhere((element) => element == old);
+    _products[index] = new_p;
     saveData();
   }
   Future saveData() async {

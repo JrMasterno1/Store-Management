@@ -16,7 +16,7 @@ class _EditScreenState extends State<EditScreen> {
     final nameController = TextEditingController(text: product.productName);
     final priceController = TextEditingController(text: product.price.toString());
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Screen'),),
+      appBar: AppBar(title: Text('Chỉnh sửa sản phẩm'),),
       body: Center(
         child: Column(
           children: [
@@ -32,7 +32,7 @@ class _EditScreenState extends State<EditScreen> {
               widget.product = p;
               });
               Navigator.pop(context, p);
-            }, child: Text('Chinh sua'))
+            }, child: Text('Chỉnh sửa'))
           ],
         ),
       ),

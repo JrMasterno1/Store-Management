@@ -27,16 +27,17 @@ class _AddScreenState extends State<AddScreen> {
     final controller = StorageProvider.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ban hang'),
+        title: Text('Bán hàng'),
         actions: [
           IconButton(onPressed: () async {
-            final index = await showSearch(context: context, delegate: CustomSearchDelegate(items: controller.products));
-            if(index != null){
-              _navigateEdit(context, controller.products[index]).then((value){
+            final p = await showSearch(context: context, delegate: CustomSearchDelegate(items: controller.products));
+            if(p != null){
+              _navigateEdit(context, p).then((value){
                 if(value != null){
                   setState(() {
-                    controller.editProduct(index, value);
+                    controller.editProduct(p, value);
                   });
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã chỉnh sửa thành công')));
                 }
               });
             }
@@ -51,13 +52,13 @@ class _AddScreenState extends State<AddScreen> {
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  hintText: 'Ten san pham'
+                  hintText: 'Tên sản phẩm'
                 ),
               ),
               TextField(
                 controller: priceController,
                 decoration: const InputDecoration(
-                hintText: 'Gia'
+                hintText: 'Giá'
                 ),
               ),
               ElevatedButton(onPressed: (){
@@ -68,7 +69,8 @@ class _AddScreenState extends State<AddScreen> {
                   priceController.clear();
                   controller.addNewProduct(proName, proPrice);
                 });
-              }, child: const Text('Them san pham'))
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã thêm sản phẩm')));
+              }, child: const Text('Thêm sản phẩm'))
             ],
           ),
         ),
@@ -123,14 +125,20 @@ class CustomSearchDelegate extends SearchDelegate{
         matchQuery.add(p);
       }
     }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (BuildContext context, int index){
-        return ListTile(
-          title: Text(matchQuery[index].productName),
-          subtitle: Text(matchQuery[index].price.toString()),
-        );
-      },
+    return Scrollbar(
+      child: ListView.builder(
+        itemCount: matchQuery.length,
+        itemBuilder: (BuildContext context, int index){
+          return ListTile(
+            title: Text(matchQuery[index].productName),
+            subtitle: Text(matchQuery[index].price.toString()),
+            onTap: (){
+              Navigator.pop(context, matchQuery[index]);
+              //_navigateEdit(context, matchQuery[index]);
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -142,18 +150,28 @@ class CustomSearchDelegate extends SearchDelegate{
         matchQuery.add(p);
       }
     }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (BuildContext context, int index){
-        return ListTile(
-          title: Text(matchQuery[index].productName),
-          subtitle: Text(matchQuery[index].price.toString()),
-          onTap: (){
-            Navigator.pop(context, index);
-            //_navigateEdit(context, matchQuery[index]);
-          },
-        );
-      },
+    return Scrollbar(
+      child: ListView.builder(
+        itemCount: matchQuery.length,
+        itemBuilder: (BuildContext context, int index){
+          return Dismissible(
+            key: ValueKey(matchQuery[index]),
+            background: Container(color: Colors.red),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_){
+              StorageProvider.of(context).deleteProduct(matchQuery[index]);
+            },
+            child: ListTile(
+              title: Text(matchQuery[index].productName),
+              subtitle: Text(matchQuery[index].price.toString()),
+              onTap: (){
+                Navigator.pop(context, matchQuery[index]);
+                //_navigateEdit(context, matchQuery[index]);
+              },
+            ),
+          );
+        },
+      ),
     );
   }
   

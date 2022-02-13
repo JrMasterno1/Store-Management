@@ -1,6 +1,6 @@
 # price_management
 
-This project is designated for my mom because she usually forget the product's price.
+This project is designated for my mom because she usually forgets the product's price.
 
 My mom is a grocery seller who has brought me up and loved me unconditionally. I hope I can help her with my little knowledge.
 

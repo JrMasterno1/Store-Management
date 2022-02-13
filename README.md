@@ -1,6 +1,8 @@
 # price_management
 
-A new Flutter project.
+This project is designated for my mom because she usually forgets the product's price.
+
+My mom is a grocery seller who has brought me up and loved me unconditionally. I hope I can help her with my little knowledge.
 
 ## Getting Started
 

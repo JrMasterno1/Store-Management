@@ -38,7 +38,7 @@ class _AddScreenState extends State<AddScreen> {
                   setState(() {
                     controller.editProduct(p, value);
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã chỉnh sửa thành công')));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã chỉnh sửa thành công')));
                 }
               });
             }

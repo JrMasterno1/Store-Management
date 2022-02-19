@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:price_management/Models/product.dart';
 
@@ -10,6 +11,7 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  int nums = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +27,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 children: <InlineSpan>[
                   TextSpan(
                     text: widget.product.productName,
-                    style: const TextStyle(fontSize: 16)
+                    style: const TextStyle(fontSize: 20)
                   )
                 ]
               )
@@ -36,7 +38,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     children: <InlineSpan>[
                       TextSpan(
                           text: widget.product.price.toString(),
-                          style: const TextStyle(fontSize: 16)
+                          style: const TextStyle(fontSize: 20)
                       )
                     ]
                 )
@@ -44,10 +46,25 @@ class _DetailScreenState extends State<DetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton(onPressed: (){}, icon: Icon(Icons.remove)),
-                IconButton(onPressed: (){}, icon: Icon(Icons.add)),
+                IconButton(onPressed: (){
+                  if(nums > 0){
+                    setState(() {
+                      nums--;
+                    });
+                  }
+                }, icon: Icon(Icons.remove)),
+                Text('$nums', style: const TextStyle(fontSize: 18),),
+                IconButton(onPressed: (){
+                  setState(() {
+                    nums++;
+                  });
+                }, icon: Icon(Icons.add)),
               ],
-            )
+            ),
+            const SizedBox(height: 30,),
+            ElevatedButton(onPressed: (){
+              Navigator.pop(context, nums);
+            }, child: const Text('Thêm vào giỏ hàng'))
           ],
         )));
   }

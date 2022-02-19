@@ -1,11 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:price_management/Controller/cart_controller.dart';
 import 'package:price_management/Models/cart.dart';
 import 'package:price_management/Models/product.dart';
 import 'package:price_management/StorageProvider.dart';
 import 'package:price_management/Views/CustomSearch.dart';
-import 'package:provider/provider.dart';
 
 import 'DetailScreen.dart';
 
@@ -27,7 +25,14 @@ class _ShoppingState extends State<Shopping> {
             IconButton(onPressed: () async {
               final p = await showSearch(context: context, delegate: CustomSearchDelegate(items: StorageProvider.of(context).products));
               if(p != null){
-
+                _navigateAddToCart(context, p).then((value){
+                  if(value != null){
+                    setState(() {
+                      CartProvider.of(context).addToCart(p, value);
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã thêm vào giỏ hàng')));
+                  }
+                });
               }
             }, icon: const Icon(Icons.search))
           ],
@@ -47,21 +52,39 @@ class _ShoppingState extends State<Shopping> {
               )
             ]
           ),
-          child: Text('Tổng số tiền', style: const TextStyle(fontSize: 20),),
+          child: Text.rich(
+            TextSpan(
+              text: "Tổng số tiền: ",
+              style: TextStyle(fontSize: 20),
+              children: <InlineSpan>[
+                TextSpan(
+                  text: calculateTotal(),
+                  style: TextStyle(fontSize: 25)
+                )
+              ]
+            )
+          ),
         ),
       ),
     );
   }
+  String calculateTotal(){
+    double total = 0;
+    CartProvider.of(context).items.forEach((item) {
+      total += item.price;
+    });
+    return total.toString();
+  }
   Future _navigateAddToCart(BuildContext context, Product product) async {
-    final new_p = await Navigator.push(
+    final cart = await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => DetailScreen(product: product))
     );
-    return new_p;
+    return cart;
   }
   Widget _buildBody(BuildContext context){
     final items = CartProvider.of(context).items;
-    return (items.isNotEmpty ? listView(items,context) : emptyView(context));
+    return (items.isNotEmpty ? listView(items, context) : emptyView(context));
   }
   Widget emptyView(BuildContext context){
     return Center(
@@ -82,7 +105,7 @@ class _ShoppingState extends State<Shopping> {
     );
   }
 
-  ListView listView(List<CartItem> items, BuildContext context) {
+  ListView listView(List<CartItem> items ,BuildContext context) {
     return ListView.builder(
     itemCount: items.length,
     itemBuilder: (context, index) {
@@ -91,33 +114,48 @@ class _ShoppingState extends State<Shopping> {
         child: Dismissible(
           key: ValueKey(items[index]),
           direction: DismissDirection.endToStart,
-          background: Container(
+          child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFE6F6),
-              borderRadius: BorderRadius.circular(15)
+                color: const Color(0xFFFE6F6),
+                borderRadius: BorderRadius.circular(15)
             ),
-            child: Column(
+            child: Row(
               children: [
-                Text(items[index].product!.productName),
-                const SizedBox(height: 10,),
-                Text.rich(
-                  TextSpan(
-                    text: "\$${items[index].product!.price}",
-                    style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.orangeAccent)
-                  )
-                )
+                Column(
+                  children: [
+                    Text(items[index].product!.productName, style: const TextStyle(fontSize: 18),),
+                    const SizedBox(height: 10,),
+                    Text.rich(
+                        TextSpan(
+                            text: "\$${items[index].product!.price}",
+                            style: const TextStyle(fontSize: 16,fontWeight: FontWeight.w600, color: Colors.orangeAccent),
+                          children: [
+                            WidgetSpan(child: Container(
+                              padding: EdgeInsets.only(left: 10),
+                              child: Text(
+                                  'x${items[index].num}',
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black
+                                  )
+                              ),
+                            )
+                            )
+                          ]
+                        )
+                    )
+                  ],
+                ),
+                const Spacer(),
+                const Icon(Icons.card_travel),
               ],
-            )
-          ),
-          child: Row(
-            children: const [
-              Spacer(),
-              Icon(Icons.card_travel),
-            ],
+            ),
           ),
           onDismissed: (direction){
-
+            setState(() {
+              items.remove(items[index]);
+            });
           },
         ),
       );

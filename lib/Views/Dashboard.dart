@@ -9,19 +9,21 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quản lý bán hàng'),
-      ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        primary: false,
-        children: [
-          buildGestureDetector(context, 'Mua hàng'),
-          buildGestureDetector(context, 'Thêm sản phẩm'),
-        ],
+    return StorageProvider(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Quản lý bán hàng'),
+        ),
+        body: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          primary: false,
+          children: [
+            buildGestureDetector(context, 'Mua hàng'),
+            buildGestureDetector(context, 'Thêm sản phẩm'),
+          ],
+        ),
       ),
     );
   }
@@ -55,7 +57,7 @@ class Dashboard extends StatelessWidget {
           ),
           onTap: (){
             if(text == 'Thêm sản phẩm') {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => StorageProvider(child: const AddScreen())));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AddScreen()));
             }
             else {
               Navigator.push(context, MaterialPageRoute(builder: (context) => CartProvider(child: const Shopping())));

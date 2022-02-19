@@ -2,8 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:price_management/Controller/cart_controller.dart';
 import 'package:price_management/Models/cart.dart';
+import 'package:price_management/Models/product.dart';
 import 'package:price_management/StorageProvider.dart';
+import 'package:price_management/Views/CustomSearch.dart';
 import 'package:provider/provider.dart';
+
+import 'DetailScreen.dart';
 
 class Shopping extends StatefulWidget {
   const Shopping({Key? key}) : super(key: key);
@@ -19,10 +23,18 @@ class _ShoppingState extends State<Shopping> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Mua hàng'),
+          actions: [
+            IconButton(onPressed: () async {
+              final p = await showSearch(context: context, delegate: CustomSearchDelegate(items: StorageProvider.of(context).products));
+              if(p != null){
+
+              }
+            }, icon: const Icon(Icons.search))
+          ],
         ),
         body: _buildBody(context),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           height: 174,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -35,10 +47,17 @@ class _ShoppingState extends State<Shopping> {
               )
             ]
           ),
-          child: Text('Tổng số tiền', style: TextStyle(fontSize: 20),),
+          child: Text('Tổng số tiền', style: const TextStyle(fontSize: 20),),
         ),
       ),
     );
+  }
+  Future _navigateAddToCart(BuildContext context, Product product) async {
+    final new_p = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DetailScreen(product: product))
+    );
+    return new_p;
   }
   Widget _buildBody(BuildContext context){
     final items = CartProvider.of(context).items;
@@ -49,8 +68,8 @@ class _ShoppingState extends State<Shopping> {
       child: Padding(
         padding: const EdgeInsets.only(top: 100),
         child: Column(
-          children: [
-            const Icon(Icons.shopping_cart_outlined,size: 100,),
+          children: const [
+            Icon(Icons.shopping_cart_outlined,size: 100,),
             SizedBox(height: 10,),
             Text(
               "Giỏ hàng trống",

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:price_management/StorageProvider.dart';
 import 'package:price_management/Views/AddScreen.dart';
+import 'package:price_management/Views/Dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
           // is not restarted.
           primarySwatch: Colors.blue,
         ),
-        home: AddScreen(),
+        home: const Dashboard(),
       ),
     );
   }

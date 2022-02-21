@@ -1,4 +1,5 @@
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:price_management/StorageProvider.dart';
 import 'package:price_management/Views/AddScreen.dart';
@@ -6,26 +7,36 @@ import 'package:price_management/Views/Shopping.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return StorageProvider(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Quản lý bán hàng'),
-        ),
-        body: GridView.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          primary: false,
-          children: [
-            buildGestureDetector(context, 'Mua hàng'),
-            buildGestureDetector(context, 'Thêm sản phẩm'),
-          ],
-        ),
-      ),
-    );
+    return FutureBuilder(
+      future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+      if(snapshot.hasError){
+        return Text('Error');
+      }
+      if(snapshot.connectionState == ConnectionState.done){
+        return StorageProvider(
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Quản lý bán hàng'),
+            ),
+            body: GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              primary: false,
+              children: [
+                buildGestureDetector(context, 'Mua hàng'),
+                buildGestureDetector(context, 'Thêm sản phẩm'),
+              ],
+            ),
+          ),
+        );
+      }
+      return const CircularProgressIndicator();
+    });
+
   }
 
   GestureDetector buildGestureDetector(BuildContext context,String text) {

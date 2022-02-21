@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "154075689962",
+    "project_id": "store-management-f321d",
+    "storage_bucket": "store-management-f321d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154075689962:android:77876c21d05a5482c53893",
+        "android_client_info": {
+          "package_name": "it.taphoathuylien.store_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "154075689962-e63gnttp7h1tuct908d6lcql1fpfd4iv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdB-Ay56GtFAi4P9riWsFvOQNLu6L_vAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "154075689962-e63gnttp7h1tuct908d6lcql1fpfd4iv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

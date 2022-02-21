@@ -47,7 +47,7 @@ class _AddScreenState extends State<AddScreen> {
       ),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
               TextField(

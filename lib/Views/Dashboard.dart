@@ -4,39 +4,62 @@ import 'package:flutter/material.dart';
 import 'package:price_management/StorageProvider.dart';
 import 'package:price_management/Views/AddScreen.dart';
 import 'package:price_management/Views/Shopping.dart';
+import 'package:price_management/Views/login_form.dart';
+import 'package:price_management/shared/firebase_auth.dart';
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({Key? key}) : super(key: key);
+class Dashboard extends StatefulWidget {
+  final String uid;
+  final FirebaseAuthentication auth;
+  const Dashboard({Key? key, required this.uid, required this.auth}) : super(key: key);
+
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  Future loadData(BuildContext context) async {
+    await StorageProvider.of(context).readPref(widget.uid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Firebase.initializeApp(),
+      future: loadData(context),
         builder: (context, snapshot) {
       if(snapshot.hasError){
         return Text('Error');
       }
-      if(snapshot.connectionState == ConnectionState.done){
-        return StorageProvider(
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text('Quản lý bán hàng'),
-            ),
-            body: GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              primary: false,
-              children: [
-                buildGestureDetector(context, 'Mua hàng'),
-                buildGestureDetector(context, 'Thêm sản phẩm'),
-              ],
-            ),
-          ),
-        );
-      }
-      return const CircularProgressIndicator();
-    });
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text('Quản lý bán hàng'),
+            actions: [
+              IconButton(onPressed: (){
 
+                widget.auth.logout().then((value){
+                  // ignore: prefer_const_constructors
+                  if(value){
+                      StorageProvider.of(context).clearData();
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => LoginScreen()));
+                  }
+                  else {
+                    print("Logout error");
+                  }
+                });
+              }, icon: const Icon(Icons.logout))
+            ],
+          ),
+          body: snapshot.connectionState == ConnectionState.done ? GridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            primary: false,
+            children: [
+              buildGestureDetector(context, 'Mua hàng'),
+              buildGestureDetector(context, 'Thêm sản phẩm'),
+            ],
+          ): const Center(child: CircularProgressIndicator()),
+      );
+    });
   }
 
   GestureDetector buildGestureDetector(BuildContext context,String text) {

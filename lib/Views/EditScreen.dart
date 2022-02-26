@@ -20,11 +20,17 @@ class _EditScreenState extends State<EditScreen> {
       body: Center(
         child: Column(
           children: [
-            TextFormField(
-              controller: nameController,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: TextFormField(
+                controller: nameController,
+              ),
             ),
-            TextFormField(
-              controller: priceController,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: TextFormField(
+                controller: priceController,
+              ),
             ),
             ElevatedButton(onPressed: (){
               Product p = Product(productName: nameController.text, price: double.tryParse(priceController.text)!);

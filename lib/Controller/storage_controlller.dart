@@ -3,16 +3,18 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:price_management/Models/product.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageController {
   final _products = <Product>[];
   String path = '';
+  static final StorageController _instance = StorageController._internal();
+  StorageController._internal();
+  factory StorageController(){
+    return _instance;
+  }
 
-
-  Future readPref() async {
+  Future readPref(String uid) async {
     // SharedPreferences pref = await SharedPreferences.getInstance();
     // String? content = pref.getString('products');
     // if(content != null){
@@ -27,7 +29,8 @@ class StorageController {
     CollectionReference collection = db.collection('store');
     QuerySnapshot snapshot = await collection.get();
     List<QueryDocumentSnapshot> list = snapshot.docs;
-    DocumentSnapshot document = list[0];
+    int index = list.indexWhere((element) => element.id == uid);
+    DocumentSnapshot document = list[index];
     String prods = document.get('products');
     if(prods.isNotEmpty){
       List myMap = jsonDecode(prods);
@@ -73,5 +76,8 @@ class StorageController {
     DocumentSnapshot document = list[0];
     final id = document.id;
     collection.doc(id).update({'products' : json });
+  }
+  void clearData(){
+    _products.clear();
   }
 }

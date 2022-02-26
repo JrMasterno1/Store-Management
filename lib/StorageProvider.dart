@@ -31,9 +31,7 @@ class StorageProvider extends InheritedWidget{
   StorageProvider({
     Key? key,
     required Widget child,
-  }) : super(key: key, child: child){
-   _controller.readPref();
-  }
+  }) : super(key: key, child: child);
   static StorageController of(BuildContext context){
     final StorageProvider result = context.dependOnInheritedWidgetOfExactType<StorageProvider>()!;
     assert(result != null, 'No StorageProvider found in context');

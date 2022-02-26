@@ -16,80 +16,78 @@ class Shopping extends StatefulWidget {
 class _ShoppingState extends State<Shopping> {
   @override
   Widget build(BuildContext context) {
-    return CartProvider(
-      child: FutureBuilder(
-          future: CartProvider.of(context).readPref(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text('Mua hàng'),
-                  actions: [
-                    IconButton(
-                        onPressed: () async {
-                          final p = await showSearch(
-                              context: context,
-                              delegate: CustomSearchDelegate(
-                                  items: StorageProvider.of(context).products));
-                          if (p != null) {
-                            _navigateAddToCart(context, p).then((value) {
-                              if (value != null) {
-                                setState(() {
-                                  CartProvider.of(context).addToCart(p, value);
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Đã thêm vào giỏ hàng')));
-                              }
-                            });
-                          }
-                        },
-                        icon: const Icon(Icons.search))
+    return FutureBuilder(
+        future: CartProvider.of(context).readPref(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Mua hàng'),
+                actions: [
+                  IconButton(
+                      onPressed: () async {
+                        final p = await showSearch(
+                            context: context,
+                            delegate: CustomSearchDelegate(
+                                items: StorageProvider.of(context).products));
+                        if (p != null) {
+                          _navigateAddToCart(context, p).then((value) {
+                            if (value != null) {
+                              setState(() {
+                                CartProvider.of(context).addToCart(p, value);
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Đã thêm vào giỏ hàng')));
+                            }
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.search))
+                ],
+              ),
+              body: _buildBody(context),
+              bottomNavigationBar: Container(
+                padding: const EdgeInsets.all(20),
+                height: 174,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                          offset: const Offset(0, -15),
+                          blurRadius: 20,
+                          color: const Color(0xffdadada).withOpacity(0.15))
+                    ]),
+                child: Column(
+                  children: [
+                    Text.rich(TextSpan(
+                        text: "Tổng số tiền: ",
+                        style: TextStyle(fontSize: 20),
+                        children: <InlineSpan>[
+                          TextSpan(
+                              text: calculateTotal(),
+                              style: TextStyle(fontSize: 25))
+                        ])),
+                    Row(
+                      children: [
+                        Expanded(child: Container()),
+                        ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                              CartProvider.of(context).clearPref();
+                              });
+                            },
+                            child: const Text('Đã thanh toán'))
+                      ],
+                    )
                   ],
                 ),
-                body: _buildBody(context),
-                bottomNavigationBar: Container(
-                  padding: const EdgeInsets.all(20),
-                  height: 174,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                            offset: const Offset(0, -15),
-                            blurRadius: 20,
-                            color: const Color(0xffdadada).withOpacity(0.15))
-                      ]),
-                  child: Column(
-                    children: [
-                      Text.rich(TextSpan(
-                          text: "Tổng số tiền: ",
-                          style: TextStyle(fontSize: 20),
-                          children: <InlineSpan>[
-                            TextSpan(
-                                text: calculateTotal(),
-                                style: TextStyle(fontSize: 25))
-                          ])),
-                      Row(
-                        children: [
-                          Expanded(child: Container()),
-                          ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                CartProvider.of(context).clearPref();
-                                });
-                              },
-                              child: Text('Đã thanh toán'))
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              );
-            }
-            return CircularProgressIndicator();
-          }),
-    );
+              ),
+            );
+          }
+          return CircularProgressIndicator();
+        });
   }
 
   String calculateTotal() {

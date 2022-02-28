@@ -14,7 +14,7 @@ class StorageController {
     return _instance;
   }
 
-  void readPref(String uid, List list){
+  void readPref(String uid, List pros){
     // SharedPreferences pref = await SharedPreferences.getInstance();
     // String? content = pref.getString('products');
     // if(content != null){
@@ -24,20 +24,26 @@ class StorageController {
     //     _products.add(p);
     //   });
     // }
+    print(pros[0]);
     this.uid = uid;
-    int index = list.indexWhere((element) => element.id == uid);
-    DocumentSnapshot document = list[index];
-    String prods = document.get('products');
-    if(prods.isNotEmpty){
-      List proMap = jsonDecode(prods);
-      proMap.forEach((element) {
-        Product p = Product.fromJson(element);
+
+    pros.forEach((element) {
+      if(element.data().length != 0){
+        print(element.data().length);
+        Product p = Product.fromJson(element.data());
         int i = _products.indexWhere((cur) => cur.productName == p.productName);
         if(i == -1){
           _products.add(p);
         }
-      });
-    }
+      }
+    });
+    // String prods = document!.get('products');
+    // if(prods.isNotEmpty){
+    //   List proMap = jsonDecode(prods);
+    //   proMap.forEach((element) {
+    //
+    //   });
+    // }
   }
   List<Product> get products => List.unmodifiable(_products);
   void addNewProduct(String name, double price){
@@ -69,10 +75,13 @@ class StorageController {
     // pref.setString('products', json);
 
     FirebaseFirestore db = FirebaseFirestore.instance;
-    CollectionReference collection = db.collection('store');
+    CollectionReference collection = db.collection('store').doc(uid).collection('products');
     QuerySnapshot snapshot = await collection.get();
     List<QueryDocumentSnapshot> list = snapshot.docs;
-    int index = list.indexWhere((element) => element.id == uid);
+
+    int index = list.indexWhere((element){
+      Map<String, dynamic> json = element.get()
+    });
     DocumentSnapshot document = list[index];
     final id = document.id;
     collection.doc(id).update({'products' : json });

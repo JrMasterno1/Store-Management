@@ -10,23 +10,23 @@ import 'package:price_management/Views/chart_screen.dart';
 import 'package:price_management/Views/login_form.dart';
 import 'package:price_management/shared/firebase_auth.dart';
 
-class Dashboard extends StatefulWidget {
+class Dashboard extends StatelessWidget {
   final String uid;
   final FirebaseAuthentication auth;
-  const Dashboard({Key? key, required this.uid, required this.auth}) : super(key: key);
+  Dashboard({Key? key, required this.uid, required this.auth}) : super(key: key);
 
-  @override
-  State<Dashboard> createState() => _DashboardState();
-}
-
-class _DashboardState extends State<Dashboard> {
-  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance.collection('store').snapshots();
+//   @override
+//   State<Dashboard> createState() => _DashboardState();
+// }
+//
+// class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance.collection('store').doc(uid).collection('products').snapshots();
     return StreamBuilder(
       stream: _stream,
-        builder: (context, snapshot) {
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
       if(snapshot.hasError){
         return Text('Error');
       }
@@ -36,7 +36,7 @@ class _DashboardState extends State<Dashboard> {
             actions: [
               IconButton(onPressed: (){
 
-                widget.auth.logout().then((value){
+                auth.logout().then((value){
                   if(value){
                       StorageProvider.of(context).clearData();
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => LoginScreen()));
@@ -48,18 +48,19 @@ class _DashboardState extends State<Dashboard> {
               }, icon: const Icon(Icons.logout))
             ],
           ),
-          body:Body(snapshot)
+          body:Body(snapshot, context)
       );
     });
   }
-  Widget Body(snapshot){
+  Widget Body(AsyncSnapshot<QuerySnapshot> snapshot, BuildContext context){
     if(snapshot.connectionState == ConnectionState.waiting){
       return const Center(child: CircularProgressIndicator());
     }
-    print("Here");
-    StorageProvider.of(context).readPref(widget.uid, snapshot.data.docs);
+
+    StorageProvider.of(context).readPref(uid, snapshot.data!.docs);
+
     RevenueController revenueController = RevenueController();
-    revenueController.readData(widget.uid, snapshot);
+    revenueController.readData(uid, FirebaseFirestore.instance.collection('store').doc(uid).collection('months'));
     return GridView.count(
       crossAxisCount: 2,
       mainAxisSpacing: 10,
@@ -106,7 +107,7 @@ class _DashboardState extends State<Dashboard> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => CartProvider(child: const Shopping())));
             }
             else {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ChartScreen(uid: widget.uid)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChartScreen(uid: uid)));
             }
           },
         );

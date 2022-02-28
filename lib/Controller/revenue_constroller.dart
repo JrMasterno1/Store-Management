@@ -11,44 +11,27 @@ class RevenueController {
     return _instance;
   }
   List get revenues => List.unmodifiable(_revenues);
-  Future readData(String uid, snapshot) async {
-    List list = snapshot.data.docs;
+  Future readData(String uid, CollectionReference collection) async {
     this.uid = uid;
-    int index = list.indexWhere((element){
-      return element.id == uid;
-    });
-    DocumentSnapshot document = list[index];
-    List lates = getLatestMonths();
-    lates.forEach((element) {
-      int i = _revenues.indexWhere((item) => item.month == element);
+    QuerySnapshot snapshot = await collection.get();
+    List list = snapshot.docs;
+    Map<String, dynamic> months = list[0].data();
+    months.forEach((key, value) {
+      int i = _revenues.indexWhere((item) => item.month == int.tryParse(key));
       if(i == -1){
-        _revenues.add(Sale(month: element, revenue: double.tryParse(document.get(element.toString()).toString())!));
+        _revenues.add(Sale(month: int.tryParse(key)!,revenue: value.toDouble()));
       }
       else {
-        _revenues[i].revenue = double.tryParse(document.get(element.toString()).toString())!;
+        revenues[i].revenue = value;
       }
     });
   }
   Future saveData(double price) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     CollectionReference collection = db.collection('store');
-    QuerySnapshot snapshot = await collection.get();
-    List<QueryDocumentSnapshot> list = snapshot.docs;
-    int index = list.indexWhere((element){
-      print("${element.id} == ${uid}");
-      return element.id == uid;
-    });
-    print(index);
-    DocumentSnapshot document = list[index];
-    final id = document.id;
-    // get current revenue
-    int currentIndexRevenue = _revenues.indexWhere((element)
-    {
-      return element.month.toString() == DateTime.now().month.toString();
-    });
-    final currentRevenue = _revenues[currentIndexRevenue];
-    currentRevenue.revenue += price;
-    collection.doc(id).update({DateTime.now().month.toString() : currentRevenue.revenue});
+    DocumentReference qds =  collection.doc(uid);
+    DocumentSnapshot document = await qds.get();
+    qds.update({DateTime.now().month.toString(): document.get(DateTime.now().month.toString()) + price});
   }
   List getLatestMonths(){
     int currentMonth = DateTime.now().month;

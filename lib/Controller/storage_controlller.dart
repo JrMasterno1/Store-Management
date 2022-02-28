@@ -1,20 +1,20 @@
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:price_management/Models/product.dart';
 
 class StorageController {
   final _products = <Product>[];
-  String path = '';
+  String uid = '';
   static final StorageController _instance = StorageController._internal();
+
   StorageController._internal();
   factory StorageController(){
     return _instance;
   }
 
-  Future readPref(String uid) async {
+  void readPref(String uid, List list){
     // SharedPreferences pref = await SharedPreferences.getInstance();
     // String? content = pref.getString('products');
     // if(content != null){
@@ -24,19 +24,18 @@ class StorageController {
     //     _products.add(p);
     //   });
     // }
-
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    CollectionReference collection = db.collection('store');
-    QuerySnapshot snapshot = await collection.get();
-    List<QueryDocumentSnapshot> list = snapshot.docs;
+    this.uid = uid;
     int index = list.indexWhere((element) => element.id == uid);
     DocumentSnapshot document = list[index];
     String prods = document.get('products');
     if(prods.isNotEmpty){
-      List myMap = jsonDecode(prods);
-      myMap.forEach((element) {
+      List proMap = jsonDecode(prods);
+      proMap.forEach((element) {
         Product p = Product.fromJson(element);
-        _products.add(p);
+        int i = _products.indexWhere((cur) => cur.productName == p.productName);
+        if(i == -1){
+          _products.add(p);
+        }
       });
     }
   }
@@ -73,7 +72,8 @@ class StorageController {
     CollectionReference collection = db.collection('store');
     QuerySnapshot snapshot = await collection.get();
     List<QueryDocumentSnapshot> list = snapshot.docs;
-    DocumentSnapshot document = list[0];
+    int index = list.indexWhere((element) => element.id == uid);
+    DocumentSnapshot document = list[index];
     final id = document.id;
     collection.doc(id).update({'products' : json });
   }

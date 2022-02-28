@@ -16,7 +16,7 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Chỉnh sửa sản phẩm'),
+          title: Text('Chọn số lượng sản phẩm'),
         ),
         body: Center(child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

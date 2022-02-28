@@ -1,11 +1,12 @@
 
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:price_management/Models/cart.dart';
 import 'package:price_management/Models/product.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CartController {
+class CartController with ChangeNotifier {
   final _items = <CartItem> [];
   List<CartItem> get items => _items;
   late SharedPreferences pref;
@@ -34,12 +35,13 @@ class CartController {
       json += jsonEncode(element.toJson()) + ',';
     });
     json = json.substring(0, json.length - 1) + ']';
-
+    notifyListeners();
     pref.setString('carts', json);
   }
   Future clearPref() async {
     pref.clear();
     _items.clear();
+    notifyListeners();
   }
   void addToCart(Product p, int num){
     for(var i in _items){
@@ -56,5 +58,6 @@ class CartController {
   }
   void deleteCart(int index){
     _items.remove(_items[index]);
+    notifyListeners();
   }
 }

@@ -18,6 +18,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController txtPassword = TextEditingController();
   String _message = '';
   @override
+  void dispose() {
+    // TODO: implement dispose
+    txtPassword.dispose();
+    txtUsername.dispose();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
   Size size = MediaQuery.of(context).size;
     return Scaffold(

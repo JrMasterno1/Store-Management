@@ -56,8 +56,9 @@ class Dashboard extends StatelessWidget {
     if(snapshot.connectionState == ConnectionState.waiting){
       return const Center(child: CircularProgressIndicator());
     }
-
-    StorageProvider.of(context).readPref(uid, snapshot.data!.docs);
+    if(snapshot.hasData){
+      StorageProvider.of(context).readPref(uid, snapshot.data!.docs);
+    }
 
     RevenueController revenueController = RevenueController();
     revenueController.readData(uid, FirebaseFirestore.instance.collection('store').doc(uid).collection('months'));
@@ -101,7 +102,7 @@ class Dashboard extends StatelessWidget {
           ),
           onTap: (){
             if(text == 'Thêm sản phẩm') {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AddScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AddScreen()));
             }
             else if (text == 'Mua hàng') {
               Navigator.push(context, MaterialPageRoute(builder: (context) => CartProvider(child: const Shopping())));

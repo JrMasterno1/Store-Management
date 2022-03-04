@@ -6,53 +6,51 @@ import 'package:price_management/Models/product.dart';
 import 'package:price_management/StorageProvider.dart';
 import 'package:price_management/Views/CustomSearch.dart';
 import 'package:price_management/Views/EditScreen.dart';
+import 'package:provider/provider.dart';
 
-class AddScreen extends StatefulWidget {
-  const AddScreen({Key? key}) : super(key: key);
+class AddScreen extends StatelessWidget {
+  AddScreen({Key? key}) : super(key: key);
 
-  @override
-  _AddScreenState createState() => _AddScreenState();
-}
-
-class _AddScreenState extends State<AddScreen> {
+//   @override
+//   _AddScreenState createState() => _AddScreenState();
+// }
+//
+// class _AddScreenState extends State<AddScreen> {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    nameController.dispose();
-    priceController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = StorageProvider.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bán hàng'),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                final p = await showSearch(
-                    context: context,
-                    delegate: CustomSearchDelegate(items: controller.products));
-                if (p != null) {
-                  _navigateEdit(context, p).then((value) {
-                    if (value != null) {
-                      setState(() {
-                        controller.editProduct(p, value);
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Đã chỉnh sửa thành công')));
-                    }
-                  });
-                }
-              },
-              icon: const Icon(Icons.search))
-        ],
+    return ChangeNotifierProvider.value(
+      value: StorageProvider.of(context),
+      child: Consumer<StorageController>(
+        builder: (context, myModel, child) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Bán hàng'),
+              actions: [
+                IconButton(
+                    onPressed: () async {
+                      final p = await showSearch(
+                          context: context,
+                          delegate: CustomSearchDelegate(items: myModel.products));
+                      if (p != null) {
+                        _navigateEdit(context, p).then((value) {
+                          if (value != null) {
+                              myModel.editProduct(p, value);
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                content: Text('Đã chỉnh sửa thành công')));
+                          }
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.search))
+              ],
+            ),
+            body: buildBody(myModel, context),
+          );
+        }
       ),
-      body: buildBody(controller, context),
     );
   }
 
@@ -74,11 +72,9 @@ class _AddScreenState extends State<AddScreen> {
                 onPressed: () {
                   String proName = nameController.text;
                   double proPrice = double.tryParse(priceController.text)!;
-                  setState(() {
-                    nameController.clear();
-                    priceController.clear();
+                  nameController.clear();
+                  priceController.clear();
                     controller.addNewProduct(proName, proPrice);
-                  });
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Đã thêm sản phẩm')));
                 },
@@ -87,18 +83,6 @@ class _AddScreenState extends State<AddScreen> {
         ),
       ),
     );
-  }
-
-  Future<List<Product>> readFile() async {
-    String myString =
-        await DefaultAssetBundle.of(context).loadString('assets/prolists.json');
-    List myMap = jsonDecode(myString);
-    List<Product> prods = [];
-    myMap.forEach((dynamic element) {
-      Product p = Product.fromJson(element);
-      prods.add(p);
-    });
-    return prods;
   }
 
   Future _navigateEdit(BuildContext context, Product product) async {

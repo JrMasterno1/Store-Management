@@ -22,7 +22,7 @@ class RevenueController {
         _revenues.add(Sale(month: int.tryParse(key)!,revenue: value.toDouble()));
       }
       else {
-        revenues[i].revenue = value;
+        revenues[i].revenue = value.toDouble();
       }
     });
   }

@@ -82,7 +82,7 @@ class Shopping extends StatelessWidget {
                                     // call with changenotifier
                                     RevenueController controller = RevenueController();
                                     controller.saveData(double.tryParse(calculateTotal(context))!).then((value) {
-                                      CartProvider.of(context).clearPref();
+                                      myModel.clearPref();
                                     });
                                   },
                                   child: const Text('Đã thanh toán'))

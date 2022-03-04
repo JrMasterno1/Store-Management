@@ -6,20 +6,20 @@ import 'package:price_management/Controller/revenue_constroller.dart';
 import 'package:price_management/Models/sales.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class ChartScreen extends StatefulWidget {
+class ChartScreen extends StatelessWidget {
   String uid;
   ChartScreen({Key? key, required this.uid}) : super(key: key);
-
-  @override
-  _ChartScreenState createState() => _ChartScreenState();
-}
-
-class _ChartScreenState extends State<ChartScreen> {
-  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance.collection('store').snapshots();
+//
+//   @override
+//   _ChartScreenState createState() => _ChartScreenState();
+// }
+//
+// class _ChartScreenState extends State<ChartScreen> {
 
   @override
   Widget build(BuildContext context) {
     final controller = RevenueController();
+    final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance.collection('store').doc(uid).collection('months').snapshots();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -32,7 +32,6 @@ class _ChartScreenState extends State<ChartScreen> {
               return Text('Error');
             }
             if(snapshot.connectionState == ConnectionState.waiting){
-
               return CircularProgressIndicator();
             }
             return SfCartesianChart(

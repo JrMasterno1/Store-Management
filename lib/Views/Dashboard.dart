@@ -23,9 +23,8 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance.collection('store').doc(uid).collection('products').snapshots();
-    return StreamBuilder(
-      stream: _stream,
+    return FutureBuilder(
+      future: FirebaseFirestore.instance.collection('store').doc(uid).collection('products').get(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
       if(snapshot.hasError){
         return Text('Error');

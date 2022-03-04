@@ -22,15 +22,18 @@ class RevenueController {
         _revenues.add(Sale(month: int.tryParse(key)!,revenue: value.toDouble()));
       }
       else {
-        revenues[i].revenue = value.toDouble();
+        _revenues[i].revenue = value.toDouble();
       }
     });
   }
   Future saveData(double price) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    CollectionReference collection = db.collection('store');
-    DocumentReference qds =  collection.doc(uid);
-    DocumentSnapshot document = await qds.get();
+    CollectionReference collection = db.collection('store').doc(uid).collection('months');
+    QuerySnapshot snapshot = await collection.get();
+    QueryDocumentSnapshot document = snapshot.docs[0];
+    DocumentReference qds = collection.doc(document.id);
+    int index = _revenues.indexWhere((item) => item.month == DateTime.now().month);
+    _revenues[index].revenue += price;
     qds.update({DateTime.now().month.toString(): document.get(DateTime.now().month.toString()) + price});
   }
   List getLatestMonths(){

@@ -72,6 +72,7 @@ class StorageController with ChangeNotifier {
   void editProduct(Product old, Product new_p){
     int index = _products.indexWhere((element) => element == old);
     _products[index] = new_p;
+    new_p.id = old.id;
     saveData(new_p.id, new_p);
   }
   Future saveData(int proID, Product p) async {
@@ -86,6 +87,7 @@ class StorageController with ChangeNotifier {
     // pref.setString('products', json);
     FirebaseFirestore db = FirebaseFirestore.instance;
     CollectionReference collection = db.collection('store').doc(uid).collection('products');
+    print(p.toJson());
     await collection.doc(proID.toString()).set(p.toJson());
     notifyListeners();
   }

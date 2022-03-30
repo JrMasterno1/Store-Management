@@ -38,7 +38,7 @@ class Dashboard extends StatelessWidget {
                 auth.logout().then((value){
                   if(value){
                       StorageProvider.of(context).clearData();
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => LoginScreen()));
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => LoginScreen(auth: auth,)));
                   }
                   else {
                     print("Logout error");
@@ -68,7 +68,7 @@ class Dashboard extends StatelessWidget {
       primary: false,
       children: [
         buildGestureDetector(context, 'Mua hàng'),
-        buildGestureDetector(context, 'Thêm sản phẩm'),
+        buildGestureDetector(context, 'Quản lý sản phẩm'),
         buildGestureDetector(context, 'Xem doanh thu')
       ],
     );
@@ -100,7 +100,7 @@ class Dashboard extends StatelessWidget {
             ),
           ),
           onTap: (){
-            if(text == 'Thêm sản phẩm') {
+            if(text == 'Quản lý sản phẩm') {
               Navigator.push(context, MaterialPageRoute(builder: (context) => AddScreen()));
             }
             else if (text == 'Mua hàng') {
@@ -113,7 +113,7 @@ class Dashboard extends StatelessWidget {
         );
   }
   Widget cardIcon(String text){
-    if(text == 'Thêm sản phẩm'){
+    if(text == 'Quản lý sản phẩm'){
       return const Icon(Icons.add_circle, size: 50, color: Colors.white,);
     }
     else if (text == 'Mua hàng'){

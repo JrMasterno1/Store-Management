@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:price_management/Controller/storage_controlller.dart';
 import 'package:price_management/Models/product.dart';
 import 'package:price_management/StorageProvider.dart';
@@ -44,7 +45,22 @@ class AddScreen extends StatelessWidget {
                         });
                       }
                     },
-                    icon: const Icon(Icons.search))
+                    icon: const Icon(Icons.search)),
+                IconButton(
+                    onPressed: () async {
+                      String barcode = await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.BARCODE);
+                      final p = await showSearch(context: context, delegate: CustomSearchDelegate(items: myModel.products),query: barcode);
+                      if (p != null) {
+                        _navigateEdit(context, p).then((value) {
+                          if (value != null) {
+                            myModel.editProduct(p, value);
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                content: Text('Đã chỉnh sửa thành công')));
+                          }
+                        });
+                      }
+                    }, 
+                    icon: const Icon(Icons.calculate))
               ],
             ),
             body: buildBody(myModel, context),
@@ -78,11 +94,21 @@ class AddScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Đã thêm sản phẩm')));
                 },
-                child: const Text('Thêm sản phẩm'))
+                child: const Text('Thêm sản phẩm')),
+            ElevatedButton(
+                onPressed: () async {
+                  nameController.text = await _scanBarCode();
+                },
+                child: Text('Scan barcode')
+            )
           ],
         ),
       ),
     );
+  }
+  Future _scanBarCode() async {
+    String barcode = await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.BARCODE);
+    return barcode;
   }
 
   Future _navigateEdit(BuildContext context, Product product) async {

@@ -2,12 +2,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:price_management/Views/register_form.dart';
 import 'package:price_management/shared/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../StorageProvider.dart';
 import 'Dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  FirebaseAuthentication auth;
+  LoginScreen({Key? key, required this.auth}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -18,15 +20,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLogin = true;
   final TextEditingController txtUsername = TextEditingController();
   final TextEditingController txtPassword = TextEditingController();
-  late FirebaseAuthentication auth;
   @override
   void initState() {
     // TODO: implement initState
-    Firebase.initializeApp().whenComplete((){
-      setState(() {
-        auth = FirebaseAuthentication();
-      });
-    });
+
     super.initState();
   }
   @override
@@ -55,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: txtUsername,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
-                hintText: 'Username', icon: Icon(Icons.verified_user)),
+                hintText: 'Email', icon: Icon(Icons.verified_user)),
             validator: (text) => text!.isEmpty ? 'User name is required' : '',
           ),
         ),
@@ -90,16 +87,17 @@ class _LoginScreenState extends State<LoginScreen> {
           child: ElevatedButton(
             onPressed: () {
               String userId = '';
-              auth.login(txtUsername.text, txtPassword.text).then((value){
+              widget.auth.login(txtUsername.text, txtPassword.text).then((value){
                 if(value!= null){
                     setState(() {
                       userId = value;
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => StorageProvider(child: Dashboard(uid: userId, auth: auth,))));
+                      saveUserIDAndPassword(txtUsername.text, txtPassword.text);
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => StorageProvider(child: Dashboard(uid: userId, auth: widget.auth,))));
                     });
                 }
                 else {
                   setState(() {
-                    _message = "Incorrect username/password";
+                    _message = "Incorrect email/password";
                   });
                 }
               });
@@ -149,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
           child: GestureDetector(
             onTap: () => {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(auth: auth,)))
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RegisterScreen(auth: widget.auth,)))
             },
             child: const Text(
               "Don't Have an Account? Sign up",
@@ -163,5 +161,10 @@ class _LoginScreenState extends State<LoginScreen> {
         )
       ],
     ));
+  }
+  Future saveUserIDAndPassword(String username, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("username", username);
+    await prefs.setString("password", password);
   }
 }

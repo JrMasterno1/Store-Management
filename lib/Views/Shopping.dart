@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:price_management/Controller/cart_controller.dart';
 import 'package:price_management/Controller/revenue_constroller.dart';
 import 'package:price_management/Models/cart.dart';
@@ -48,7 +49,23 @@ class Shopping extends StatelessWidget {
                                 });
                               }
                             },
-                            icon: const Icon(Icons.search))
+                            icon: const Icon(Icons.search)),
+                        IconButton(
+                            onPressed: () async {
+                              String barcode = await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.BARCODE);
+                              final p = await showSearch(context: context, delegate: CustomSearchDelegate(items: StorageProvider.of(context).products),query: barcode);
+                              if (p != null) {
+                                _navigateAddToCart(context, p).then((value) {
+                                  if (value != null) {
+                                    CartProvider.of(context).addToCart(p, value);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Đã thêm vào giỏ hàng')));
+                                  }
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.calculate))
                       ],
                     ),
                     body: _buildBody(context),

@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:154075689962:android:77876c21d05a5482c53893",
         "android_client_info": {
-          "package_name": "it.taphoathuylien.store_management"
+          "package_name": "edu.hcmus.jr.master.store_management"
         }
       },
       "oauth_client": [

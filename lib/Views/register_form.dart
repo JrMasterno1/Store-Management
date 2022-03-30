@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:price_management/Views/Dashboard.dart';
 import 'package:price_management/shared/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../StorageProvider.dart';
+import 'login_form.dart';
 
 class RegisterScreen extends StatefulWidget {
   final FirebaseAuthentication auth;
@@ -50,10 +52,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               controller: txtUsername,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: 'Username',
+                hintText: 'Email',
                 icon: Icon(Icons.verified_user),
               ),
-              validator: (text) => text!.isEmpty ? 'User name is required' : '',
+              validator: (text) => text!.isEmpty ? 'Email is required' : '',
             ),
           ),
           SizedBox(height: size.height*0.03,),
@@ -86,6 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   else {
                     setState(() {
                       userId = value;
+                      saveUserIDAndPassword(txtUsername.text, txtPassword.text);
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => StorageProvider(child: Dashboard(uid: userId,auth: widget.auth,))));
                     });
                   }
@@ -135,8 +138,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             alignment: Alignment.centerRight,
             margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
             child: GestureDetector(
-              onTap: () => {
-                Navigator.pop(context)
+              onTap: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(auth: widget.auth,)));
               },
               child: const Text(
                 "Already have an Account? Log in",
@@ -151,5 +154,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ],
       ),
     );
+  }
+  Future saveUserIDAndPassword(String userID, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("userID", userID);
+    await prefs.setString("password", password);
   }
 }
